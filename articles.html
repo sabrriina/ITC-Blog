@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Explore Articles – ITC Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="Logo.png">
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="articles.css">
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a href="index.html" class="logo"><img src="logo.png" alt="ITC Blog"></a>
+  <button class="burger" id="burger" aria-label="Toggle menu" aria-expanded="false"><i></i><i></i><i></i></button>
+  <nav class="links" id="links">
+    <a href="index.html">Home</a>
+    <a href="articles.html" class="active">Articles</a>
+    <a href="#">Events</a>
+    <a href="#">Members</a>
+    <a href="#">Departments</a>
+    <a href="#">Stats</a>
+    <a href="index.html#footer">About</a>
+    <a href="index.html#footer" class="btn btn-red nav-cta">Contact Us</a>
+  </nav>
+</header>
+
+<main class="page">
+  <section class="page-head">
+    <div>
+      <h1>EXPLORE <span>ARTICLES</span></h1>
+      <p>Browse peer-reviewed engineering papers, technical tutorials, and systems teardowns published by ITC Club members.</p>
+    </div>
+    <div class="stats" aria-label="Publication stats">
+      <div><small>ACTIVE TRACKS</small><b>07</b></div>
+      <div><small>MEAN READ</small><b>8.2m</b></div>
+      <div><small>ACCEPTANCE</small><b>31%</b></div>
+    </div>
+  </section>
+
+  <section class="toolbar">
+    <label class="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input type="search" id="search" placeholder="Search by article title, keyword, or author..." aria-label="Search articles">
+    </label>
+    <div class="filters-row">
+      <div class="filters" id="filters" role="group" aria-label="Filter by topic">
+        <button class="pill on" data-topic="all">All Topics</button>
+        <button class="pill" data-topic="Web Development">Web Development</button>
+        <button class="pill" data-topic="DevOps">DevOps</button>
+        <button class="pill" data-topic="Cloud">Cloud</button>
+        <button class="pill" data-topic="Cybersecurity">Cybersecurity</button>
+        <button class="pill" data-topic="Databases">Databases</button>
+      </div>
+      <label class="sort">Sort:
+        <select id="sort">
+          <option value="new">Latest Published</option>
+          <option value="old">Oldest First</option>
+          <option value="short">Shortest Read</option>
+          <option value="long">Longest Read</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <section class="list" id="list" aria-live="polite"></section>
+
+  <div class="more-wrap"><button class="btn btn-red" id="more">Load More Articles <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button></div>
+</main>
+
+<footer class="footer" id="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="brand">
+        <a href="#home" class="logo"><img src="logo.png" alt="ITC Blog"></a>
+        <div class="brand-name">
+          INFORMATION<br>
+          TECHNOLOGY<br>
+          COMMUNITY<i class="dot"></i>
+        </div>
+      </div>
+      <p class="muted">A community of students learning, building, and sharing their passion for technology at Blida 1.</p>
+    </div>
+    <div>
+      <h4>Explore ITC</h4>
+      <div class="two-col">
+        <ul><li><a href="index.html">Home</a></li><li><a href="#">Events</a></li><li><a href="#">Departments</a></li><li><a href="index.html#footer">About</a></li></ul>
+        <ul><li><a href="#">Projects</a></li><li><a href="#">Members</a></li><li><a href="#">Stats</a></li></ul>
+      </div>
+    </div>
+    <div>
+      <h4>Let's connect</h4>
+      <a class="mail" href="mailto:contact.itc.blida@gmail.com">contact.itc.blida@gmail.com</a>
+      <address>University of Blida 1<br>Route de Soumâa, BP 270<br>09000 Blida, Algeria</address>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span id="year">2026</span> Information Technology Community. All rights reserved.</span>
+    <span><i class="sq"></i> Built by the community, for the community.</span>
+  </div>
+</footer>
+
+<script src="articles.js"></script>
+</body>
+</html>
