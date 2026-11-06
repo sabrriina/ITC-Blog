@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecting Low-Latency Real-Time Telemetry with eBPF and Go in Kubernetes – ITC Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.png">
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="DanaArticle.css">
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="nav" id="nav">
+  <a href="index.html" class="logo"><img src="logo.png" alt="ITC Blog"></a>
+  <button class="burger" id="burger" aria-label="Toggle menu" aria-expanded="false"><i></i><i></i><i></i></button>
+  <nav class="links" id="links">
+    <a href="index.html" class="active">Home</a>
+    <a href="#">Projects</a>
+    <a href="#">Events</a>
+    <a href="#">Members</a>
+    <a href="#">Departments</a>
+    <a href="#">Stats</a>
+    <a href="index.html#footer">About</a>
+    <a href="index.html#footer" class="btn btn-red nav-cta">Contact Us</a>
+  </nav>
+</header>
+
+<main class="post">
+  <div class="top">
+    <a href="articles.html" class="back"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Back to Explore Articles</a>
+    <span class="pub"><i class="rd"></i>PUBLISHED // PEER-REVIEWED</span>
+  </div>
+
+  <div class="tags">
+    <div><span class="chip">DEVOPS</span><span class="chip dark">CLOUD</span></div>
+    <span class="rfc">RFC-1049-DZ</span>
+  </div>
+
+  <h1>Architecting Low-Latency Real-Time Telemetry with eBPF and Go in Kubernetes</h1>
+  <p class="lead">How we bypassed traditional user-space socket overhead to achieve sub-millisecond network tracing across 14 university lab nodes.</p>
+
+  <div class="byline">
+    <div class="author">
+      <span class="avatar"><img src="Pics/DanaAmine.jpg" alt="Dana Amine"></span>
+      <span><b>Dana Amine <svg class="ver" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></b><small>Systems &amp; Kernel Lead</small></span>
+    </div>
+    <div class="meta">
+      <span><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Oct 14, 2024</span><i class="dot"></i>
+      <span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>9 min read</span>
+    </div>
+  </div>
+
+  <figure class="fig">
+    <div class="fig-img">
+      <img src="pics/DanaArticle.jpg" alt="Kernel ring-buffer ingress routing" onerror="this.remove()">
+    </div>
+    <figcaption><span>Figure 1.0: Kernel ring-buffer ingress routing on k8s-node-blida-03</span><span>eBPF bytecode JIT compiled</span></figcaption>
+  </figure>
+
+  <div class="body">
+    <p>Observability in dense Kubernetes clusters invariably collides with the physical laws of Linux socket overhead. In conventional DaemonSet architectures relying on user-space proxies or sidecar sniffers, every packet undergoes multiple context switches: traversing kernel space, entering virtual network interfaces (veth pairs), jumping to user space for packet decoding, and cycling back into user memory.</p>
+    <p>Within the Department of Computer Science at University Saad Dahlab Blida 1, our research cluster handles distributed edge simulation workloads across 14 physical compute blades. Under high synthetic load (surpassing 250,000 req/sec), traditional sidecar telemetry consumed upwards of 18% of aggregate CPU time simply copying packets across user-space ring buffers.</p>
+
+    <h2><span class="num">01//</span>The Shift to In-Kernel Sandboxing</h2>
+    <p>By adopting extended Berkeley Packet Filters (eBPF), we move the observability logic directly into the Linux kernel runtime. Rather than moving gigabytes of raw network frames across memory layers, we inject verifier-validated bytecode directly into the kernel hooks (<code>sys_enter_connect</code>, <code>sock:inet_sock_set_state</code>, and <code>tc</code> ingress).</p>
+
+    <aside class="note">
+      <svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>
+      <div><h4>KERNEL SAFETY GUARANTEES WITH BPF VERIFIER</h4>
+      <p>Every loaded eBPF object undergoes static validation by the in-kernel verifier prior to execution. The program is evaluated as a Directed Acyclic Graph (DAG) ensuring bounded loops, zero uninitialized memory reads, zero out-of-bounds array access, and strictly finite instruction length. If a probe risks kernel panics, verification halts instantly.</p></div>
+    </aside>
+
+    <h3>Instrumentation Architecture: Go User-Space Coordinator</h3>
+    <p>While the hot path executes directly inside kernel space via C probes, orchestration, map extraction, and telemetry serialization into our Prometheus TSDB are maintained by a lightweight Golang agent compiled using <code>cilium/ebpf</code>. This decoupling guarantees minimal memory footprint and zero CGO runtime baggage.</p>
+
+    <div class="code">
+      <div class="code-bar"><i class="d"></i><i class="d"></i><i class="d"></i><span class="file">telemetry_probe.go</span>
+        <button class="copy" id="copy" type="button"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 012-2h9"/></svg><span>Copy</span></button></div>
+<pre id="code"><span class="l"><span class="c">// Attach eBPF kprobe to sys_enter_connect</span></span>
+<span class="l"><span class="v">sec</span> := bpfModule.<span class="f">GetProgram</span>(<span class="s">"trace_connect"</span>)</span>
+<span class="l"><span class="v">link</span>, err := sec.<span class="f">AttachKprobe</span>(<span class="s">"__x64_sys_connect"</span>)</span>
+<span class="l"><span class="k">if</span> err != <span class="k">nil</span> {</span>
+<span class="l">    log.<span class="f">Fatalf</span>(<span class="s">"[kprobe_err] attach failed on sys_connect: %v"</span>, err)</span>
+<span class="l">}</span>
+<span class="l"><span class="k">defer</span> link.<span class="f">Close</span>()</span>
+<span class="l"></span>
+<span class="l"><span class="c">// Read perf ring buffer asynchronously</span></span>
+<span class="l"><span class="v">eventsChannel</span> := <span class="k">make</span>(<span class="k">chan</span> []<span class="k">byte</span>, <span class="n">4096</span>)</span>
+<span class="l"><span class="v">pb</span>, err := perf.<span class="f">NewReader</span>(bpfModule.<span class="f">GetMap</span>(<span class="s">"events"</span>), os.<span class="f">Getpagesize</span>()*<span class="n">64</span>)</span>
+<span class="l"><span class="k">if</span> err != <span class="k">nil</span> {</span>
+<span class="l">    log.<span class="f">Fatalf</span>(<span class="s">"[perf_reader] failed to bind ring buffer: %v"</span>, err)</span>
+<span class="l">}</span>
+<span class="l"><span class="k">go</span> telemetry.<span class="f">StreamMetrics</span>(ctx, pb, eventsChannel)</span></pre>
+    </div>
+
+    <p>By tapping into the ring buffer with an asynchronous buffered channel of 4096 elements, the Go runtime processes event structures without pausing the kernel execution stream. Even during micro-bursts of ephemeral connection handshakes, drop rates remained at strict zero.</p>
+
+    <h2><span class="num">02//</span>Empirical Benchmark: Overhead Comparison</h2>
+    <p>To validate our design, we subjected our 14-node cluster to an identical HTTP/gRPC continuous bench using WRK2 across three distinct capture methodologies: Standard Ptrace syscall interception, Netfilter userland hooks (conntrack logging), and our in-kernel eBPF solution.</p>
+
+    <div class="matrix">
+      <div class="matrix-head"><b>TELEMETRY OVERHEAD MATRIX (100K REQ/S)</b><span>Kernel 6.8.0-generic</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>INSPECTION VECTOR</th><th>AVG LATENCY<br>ADDED</th><th>P99<br>ADDED</th><th>CPU<br>FOOTPRINT</th><th>CONTEXT SHIFTS</th></tr></thead>
+          <tbody>
+            <tr><td class="v">Ptrace Syscall Trap</td><td>4.28 ms</td><td>12.60 ms</td><td>24.6%</td><td>2 per syscall</td></tr>
+            <tr><td class="v">Netfilter / Conntrack</td><td>1.15 ms</td><td>3.40 ms</td><td>11.2%</td><td>1 per packet<br>batch</td></tr>
+            <tr class="best"><td class="v"><i class="rd"></i>eBPF + Go (ITC Solution)</td><td>0.08 ms</td><td>0.24 ms</td><td>1.4%</td><td>0 (In-Kernel)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p>The metrics speak with finality: eliminating context switching reduced latency overhead by over <b>93%</b> compared to Netfilter and by <b>98%</b> compared to ptrace. The CPU footprint stabilized at 1.4%, effectively vanishing within normal scheduler variation.</p>
+
+    <h2><span class="num">03//</span>Architectural Takeaways</h2>
+    <div class="cards">
+      <div class="tcard"><h4><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>Zero-Copy Ingress</h4><p>Tapping raw sockets via eBPF ring buffers bypasses TCP reassembly layers entirely, enabling direct socket-level metrics without frame cloning.</p></div>
+      <div class="tcard"><h4><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>Verifier Determinism</h4><p>Program verifiers strictly eliminate kernel panics. Unlike proprietary kernel modules (LKMs), eBPF provides rock-solid reliability guarantees in production clusters.</p></div>
+      <div class="tcard"><h4><svg viewBox="0 0 24 24"><path d="M4 18a8 8 0 1116 0M12 18l4-6"/></svg>Predictable P99 Tail Latency</h4><p>Tail latencies are bounded under intense saturation since packet probing introduces sub-millisecond execution time per syscall hook.</p></div>
+      <div class="tcard"><h4><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><path d="M10 6.5h4v4M14 17.5h-4v-4"/></svg>Seamless Mesh Integration</h4><p>Compatible with Cilium CNI and standard Kubernetes ingress controllers without re-provisioning worker node operating system kernels.</p></div>
+    </div>
+
+    <p>The production deployment is now codified as an open template for upcoming academic research sessions at Information Technology Club Blida. The full repository, BPF map structures, and Prometheus exporter manifests are available in our internal laboratory node repository.</p>
+  </div>
+
+  <hr>
+
+  <section class="author-card">
+    <span class="big">YM</span>
+    <div>
+      <div class="ac-top"><div><h3>Yacine M.</h3><small>Systems &amp; Kernel Lead @ ITC</small></div><a href="#" class="btn btn-red sm">View Author Profile →</a></div>
+      <p>Senior Computer Science Student @ Saad Dahlab Blida 1. Specializing in Linux kernel internals, low-level networking, and high-throughput distributed systems. Core maintainer of the ITC edge cluster infrastructure.</p>
+    </div>
+  </section>
+
+  <div class="dl"><a href="files/ebpf-telemetry.pdf" download class="btn btn-red"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>Download the article (1.8 MB)</a></div>
+  <hr>
+
+  <section class="related">
+    <div class="rel-head"><h3><i class="rd"></i>RELATED ENGINEERING DISPATCHES</h3><a href="articles.html">All Articles <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+    <div class="rel-grid">
+      <a href="#" class="rcard"><span class="chip">NETWORKING</span><h4>Demystifying XDP: Zero-Copy Bare Packets in userspace</h4><div><span>Amine K.</span><span>7 min read</span></div></a>
+      <a href="#" class="rcard"><span class="chip">CLOUD</span><h4>Deploying Multi-Tenant K3s on Bare Metal in University Labs</h4><div><span>Sara T.</span><span>11 min read</span></div></a>
+      <a href="#" class="rcard"><span class="chip">DEVOPS</span><h4>Continuous Benchmarking in CI/CD using Prometheus and Go</h4><div><span>Mehdi B.</span><span>6 min read</span></div></a>
+    </div>
+  </section>
+</main>
+
+<footer class="footer" id="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="brand">
+        <a href="#home" class="logo"><img src="logo.png" alt="ITC Blog"></a>
+        <div class="brand-name">
+          INFORMATION<br>
+          TECHNOLOGY<br>
+          COMMUNITY<i class="dot"></i>
+        </div>
+      </div>
+      <p class="muted">A community of students learning, building, and sharing their passion for technology at Blida 1.</p>
+      <div class="socials">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M15 3v11a4 4 0 11-4-4M15 3c.5 3 2.5 4.5 5 4.5"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z"/></svg></a>
+        <a href="#" aria-label="Discord"><svg viewBox="0 0 24 24"><path d="M7 7c3-1.5 7-1.5 10 0l2 9c-2 1.5-4 2-4 2l-1-2c-1 .3-3 .3-4 0l-1 2s-2-.5-4-2z"/><circle cx="9.5" cy="12.5" r="1"/><circle cx="14.5" cy="12.5" r="1"/></svg></a>
+      </div>
+    </div>
+    <div>
+      <h4>Explore ITC</h4>
+      <div class="two-col">
+        <ul><li><a href="#home" class="on">Home</a></li><li><a href="#">Events</a></li><li><a href="#">Departments</a></li><li><a href="#">About</a></li></ul>
+        <ul><li><a href="#">Projects</a></li><li><a href="#">Members</a></li><li><a href="#">Stats</a></li></ul>
+      </div>
+    </div>
+    <div>
+      <h4>Let's connect</h4>
+      <p class="muted">Have a question, an idea, or a collaboration in mind? We'd love to hear from you.</p>
+      <a class="mail" href="mailto:contact.itc.blida@gmail.com">contact.itc.blida@gmail.com</a>
+      <address>University of Blida 1<br>Route de Soumâa, BP 270<br>09000 Blida, Algeria</address>
+      <a href="mailto:contact.itc.blida@gmail.com" class="btn btn-ghost sm">Get in touch ↗</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span id="year">2026</span> Information Technology Community. All rights reserved.</span>
+    <span><i class="sq"></i> Built by the community, for the community.</span>
+  </div>
+</footer>
+<script src="DanaArticle.js"></script>
+</body>
+</html>

@@ -12,7 +12,7 @@ const articles = [
   { topic: "AI", tag: "AI", date: "2024-10-11", read: 11,
     title: "Quantization Horizons: AWQ vs FP8 Inference on Edge GPUs",
     excerpt: "Evaluating throughput thresholds, activation anomalies, and memory bandwidth bounds across dense transformer weights on restricted consumer silicon.",
-    author: "Yacine M.", role: "Machine Intelligence Fellow // ITC Labs", avatar: "Pics/yacine.jpg",url: "article.html" },
+    author: "Yacine M.", role: "Machine Intelligence Fellow // ITC Labs", avatar: "Pics/yacine.jpg" },
   { topic: "Databases", tag: "Databases", date: "2024-09-28", read: 7,
     title: "Lock-Free B-Trees and Concurrent LSM-Tree Pruning",
     excerpt: "Minimizing tail-write latency during heavy SSD write-amplification compaction phases through hardware CAS instructions and epoch garbage collection.",
@@ -24,7 +24,12 @@ const articles = [
   { topic: "Cloud", tag: "Cloud", date: "2024-08-30", read: 10,
     title: "Deterministic Serverless Failover across Autonomous Multi-Region Clusters",
     excerpt: "Architecting Raft-backed global health arbiters that coordinate cross-cloud egress migration within 450ms SLA without split-brain partition drift.",
-    author: "Tariq H.", role: "Cloud Distributed Systems // Core Member", avatar: "Pics/tariq.jpg" }
+    author: "Tariq H.", role: "Cloud Distributed Systems // Core Member", avatar: "Pics/tariq.jpg"},
+    { topic: "DevOps", tag: "DevOps", date: "2024-10-14", read: 9,
+    title: "Architecting Low-Latency Real-Time Telemetry with eBPF and Go in Kubernetes",
+    excerpt: "How we bypassed traditional user-space socket overhead to achieve sub-millisecond network tracing across 14 university lab nodes.",
+    author: "Amine D.", role: "Systems & Kernel Lead", avatar: "Pics/DanaAmine.jpg",url: "DanaArticle.html" },
+
 ];
 
 const PAGE = 6;
