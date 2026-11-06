@@ -12,7 +12,7 @@ const articles = [
   { topic: "AI", tag: "AI", date: "2024-10-11", read: 11,
     title: "Quantization Horizons: AWQ vs FP8 Inference on Edge GPUs",
     excerpt: "Evaluating throughput thresholds, activation anomalies, and memory bandwidth bounds across dense transformer weights on restricted consumer silicon.",
-    author: "Yacine M.", role: "Machine Intelligence Fellow // ITC Labs", avatar: "Pics/yacine.jpg" },
+    author: "Yacine M.", role: "Machine Intelligence Fellow // ITC Labs", avatar: "Pics/yacine.jpg",url: "article.html" },
   { topic: "Databases", tag: "Databases", date: "2024-09-28", read: 7,
     title: "Lock-Free B-Trees and Concurrent LSM-Tree Pruning",
     excerpt: "Minimizing tail-write latency during heavy SSD write-amplification compaction phases through hardware CAS instructions and epoch garbage collection.",
@@ -71,7 +71,7 @@ function render() {
         <p>${esc(a.excerpt)}</p>
         <div class="author">${avatar(a)}<span><b>${esc(a.author)}</b><small>${esc(a.role)}</small></span></div>
       </div>
-      <a href="#" class="btn btn-red">Read Article ${arrow}</a>
+      <a href="${a.url || '#'}" class="btn btn-red">Read Article ${arrow}</a>
     </article>`).join("")
     : '<div class="empty"><b>No articles found</b>Try a different keyword or topic.</div>';
   $("more").parentElement.hidden = all.length <= shown;

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quantization Horizons: AWQ vs FP8 Inference on Edge GPUs – ITC Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.png">
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="article.css">
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a href="index.html" class="logo"><img src="logo.png" alt="ITC Blog"></a>
+  <button class="burger" id="burger" aria-label="Toggle menu" aria-expanded="false"><i></i><i></i><i></i></button>
+  <nav class="links" id="links">
+    <a href="index.html">Home</a>
+    <a href="articles.html" class="active">Articles</a>
+    <a href="#">Events</a>
+    <a href="#">Members</a>
+    <a href="#">Departments</a>
+    <a href="#">Stats</a>
+    <a href="index.html#footer">About</a>
+    <a href="index.html#footer" class="btn btn-red nav-cta">Contact Us</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div class="topbar">
+    <a href="articles.html" class="back"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Back to Review Queue</a>
+    <div class="badges">
+      <span class="badge pending" id="status"><svg viewBox="0 0 24 24"><path d="M6 3h12M6 21h12M7 3c0 6 10 6 10 9s-10 3-10 9"/></svg><b id="statusText">PENDING REVIEW</b></span>
+      <span class="badge ghost"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>CONFIDENTIAL RFC #842</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <article class="doc">
+      <header class="hero">
+        <div class="hero-tag"><span class="chip">AI LAB</span><i class="dot"></i><span class="mono">DISPATCH_ID: ITC-2025-084-AWQ</span></div>
+        <h1>Quantization Horizons: AWQ vs FP8 Inference on Edge GPUs</h1>
+        <p>Evaluating throughput thresholds, activation anomalies, and memory bandwidth bounds across dense transformer weights.</p>
+        <div class="hero-foot">
+          <div class="author">
+            <span class="avatar au">YM</span>
+            <span><b>Yacine M.</b><small>AI Lab Fellow // Node Blida</small></span>
+          </div>
+          <div class="stats-inline">
+            <span><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6"/></svg>3,420 words</span>
+            <span><svg viewBox="0 0 24 24"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/></svg>4 Code Blocks</span>
+            <span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>14 min read</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="sec">
+        <div class="sec-head"><span>§ 01 // OVERVIEW</span><em>READ TIME: 3 MIN</em></div>
+        <h2>1. Introduction to Weight Quantization</h2>
+        <p>As modern autoregressive foundational models push parametric scales past billions of variables, consumer and edge acceleration clusters face severe bandwidth bottlenecks. Standard 16-bit floating point representations (FP16/BF16) impose memory transaction costs that dwarf pure matrix execution overhead during autoregressive token generation.</p>
+        <p>Weight quantization mitigates these limits by compressing the memory footprint of static weights to INT4, INT8, or nascent native FP8 micro-formats. However, arbitrary uniform clipping induces catastrophic perplexity degradation when activation outliers collide with static scaling vectors. Hence, selective weighting schemes have evolved to protect salient parameters without sacrificing unified GEMM throughput.</p>
+        <div class="callout">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>
+          <p>Key Premise: In memory-bound batch-1 inference scenarios, effective compute performance is primarily gated by memory bus bandwidth rather than raw Tensor Core TFLOPS.</p>
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-head"><span>§ 02 // MATHEMATICAL SPECIFICATIONS</span><em>FORMULATION DEEP DIVE</em></div>
+        <h2>2. AWQ vs FP8 Mathematical Formulations</h2>
+        <p>Activation-aware Weight Quantization (AWQ) asserts that not all weights are created equal. By inspecting average weight magnitude activations <code>s_X = E[|X|]</code>, AWQ protects the top 1% salient weights by calculating per-channel scaling factors <code>s</code> that minimize reconstruction loss:</p>
+        <div class="formula">
+          <div class="label">// AWQ OPTIMIZATION OBJECTIVE</div>
+          <div class="eq">W* = argmin_W || W X - Q(W · s⁻¹) (s · X) ||²</div>
+          <p>Where s is constrained to a grid search space s = s_X^α, balancing weight clipping error against input activation preservation.</p>
+        </div>
+        <p>Conversely, FP8 (specifically the E4M3 variant for GEMM and E5M2 for gradients) offers dynamic exponent scaling directly accelerated in modern silicon (Ada Lovelace, Hopper). FP8 avoids the offline integer dequantization kernel overhead characteristic of W4A16 pipelines, albeit at higher relative bandwidth overhead than INT4.</p>
+
+        <div class="code">
+          <div class="code-bar"><i class="d r"></i><i class="d r2"></i><i class="d g"></i><span class="file">awq_pipeline_init.py</span><em>PYTORCH 2.3 // CUDA 12.4</em></div>
+<pre><span class="c"># ITC Blida Machine Learning Evaluation Framework</span>
+<span class="k">import</span> torch
+<span class="k">from</span> transformers <span class="k">import</span> AutoModelForCausalLM, AutoTokenizer
+<span class="k">from</span> awq <span class="k">import</span> AutoAWQForCausalLM
+
+model_id = <span class="s">"meta-llama/Meta-Llama-3-8B-Instruct"</span>
+quant_path = <span class="s">"./quantized_models/llama3-8b-awq-w4g128"</span>
+
+<span class="c"># Stage 1: Load foundational checkpoint with unified memory mapping</span>
+model = AutoModelForCausalLM.from_pretrained(
+  model_id, torch_dtype=torch.float16, device_map=<span class="s">"auto"</span>
+)
+
+<span class="c"># Stage 2: Initialize Activation-Aware Quantizer (4-bit, 128 group size)</span>
+quantizer = AWQQuantizer(bits=<span class="n">4</span>, group_size=<span class="n">128</span>)
+quantizer.quantize(model, tokenizer=tokenizer, calib_data=<span class="s">"pile-val-backup"</span>)
+model.save_quantized(quant_path)</pre>
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-head"><span>§ 03 // EMPIRICAL BENCHMARKS</span><em>ORIN &amp; 4090 SUITE</em></div>
+        <h2>3. Benchmark Results: Jetson Orin vs RTX 4090</h2>
+        <p>We evaluated token production latency across two extreme hardware targets: NVIDIA Jetson AGX Orin 64GB (Edge SoC capped at 50W) and an uncapped desktop RTX 4090 (450W). Tests processed a 512 prompt token context with 256 generated tokens under vLLM 0.5.1 backend.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>HARDWARE NODE</th><th>PRECISION</th><th>VRAM<br>FOOTPRINT</th><th>THROUGHPUT<br>(TOK/S)</th><th>PERPLEXITY<br>(PPL)</th></tr></thead>
+            <tbody>
+              <tr><td class="hw">Jetson AGX<br>Orin</td><td><span class="p">FP16 Baseline</span></td><td>16.4 GB</td><td class="tp">14.2</td><td>6.12</td></tr>
+              <tr><td class="hw">Jetson AGX<br>Orin</td><td><span class="p awq">AWQ INT4 &nbsp;(g128)</span></td><td class="tp">5.8 GB</td><td class="tp">39.6<span class="gain">(+178%)</span></td><td>6.28</td></tr>
+              <tr><td class="hw">RTX 4090<br>(24GB)</td><td><span class="p">FP16 Baseline</span></td><td>16.2 GB</td><td class="tp">94.8</td><td>6.12</td></tr>
+              <tr><td class="hw">RTX 4090<br>(24GB)</td><td><span class="p fp8">FP8 (E4M3 &nbsp;GEMM)</span></td><td>8.7 GB</td><td class="tp blue">168.4<span class="gain">(+77%)</span></td><td>6.15</td></tr>
+              <tr class="best"><td class="hw">RTX 4090<br>(24GB)</td><td><span class="p awq hot">AWQ INT4 &nbsp;(Marlin)</span></td><td class="tp">5.7 GB</td><td class="tp red">214.2<span class="gain">(+125%)</span></td><td>6.29</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="chart">
+          <div class="chart-head"><b>Comparative Token Throughput (Batch Size 1)</b><span>tok/sec (higher is better)</span></div>
+          <div class="bar"><div class="row"><span>Orin FP16 (Baseline)</span><span>14.2 tok/s</span></div><div class="track"><i style="--w:6.6%;background:#fff"></i></div></div>
+          <div class="bar salmon"><div class="row"><b>Orin AWQ INT4</b><b>39.6 tok/s</b></div><div class="track"><i style="--w:18.5%;background:#ffb4a3"></i></div></div>
+          <div class="bar lav"><div class="row"><span>RTX 4090 FP8 (Native Tensor Cores)</span><span>168.4 tok/s</span></div><div class="track"><i style="--w:78.6%;background:#a8b4ff"></i></div></div>
+          <div class="bar hot"><div class="row"><b>RTX 4090 AWQ INT4 (Marlin Kernel)</b><b>214.2 tok/s</b></div><div class="track"><i style="--w:100%;background:#e8190c"></i></div></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-head"><span>§ 04 // PROTOCOL SYNTHESIS</span><em>ACTIONABLE GUIDANCE</em></div>
+        <h2>4. Production Recommendations</h2>
+        <p>When serving edge clusters with severe thermal throttles (under 60W TDP), AWQ INT4 with Marlin dequantization represents the undisputed sweet spot, offering near FP16 accuracy preservation alongside a 2.8x speedup. For centralized datacenter inference where concurrency scales to batched queries (&gt;32), FP8 maintains superior compute efficiency without quantization calibration drift.</p>
+        <div class="deploy">
+          <div class="dcard"><h3><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>Deploy AWQ When:</h3>
+            <ul><li>Batch size is small (≤ 4) on edge nodes</li><li>Total VRAM is constrained under 16GB</li><li>Inference is strictly memory bandwidth bound</li></ul></div>
+          <div class="dcard fp8"><h3><svg viewBox="0 0 24 24"><path d="M4 18a8 8 0 1116 0M12 18l4-6"/></svg>Deploy FP8 When:</h3>
+            <ul><li>Running Hopper/Ada architecture natively</li><li>Large concurrent batch sizes saturate compute</li><li>Zero calibration datasets exist</li></ul></div>
+        </div>
+      </section>
+    </article>
+
+    <aside class="review" aria-label="Review assessment">
+      <div class="r-head"><h3><i class="rd"></i>Review Assessment</h3><span class="mono hud">HUD_EVAL</span></div>
+      <div class="eyebrow">ITC PUBLISHING STANDARDS</div>
+      <div class="checks" id="checks">
+        <label class="check"><input type="checkbox" checked><i class="box"></i><span><b>Code Reproducibility</b><small>Scripts execute without missing dependencies</small></span></label>
+        <label class="check"><input type="checkbox" checked><i class="box"></i><span><b>Technical Accuracy</b><small>Mathematical equations and claims verified</small></span></label>
+        <label class="check"><input type="checkbox" checked><i class="box"></i><span><b>Clear Explanations</b><small>High editorial readability for club engineers</small></span></label>
+        <label class="check"><input type="checkbox" checked><i class="box"></i><span><b>Original Club Work</b><small>Authentic benchmarks on actual hardware</small></span></label>
+      </div>
+
+      <div class="notes-head"><label for="notes">Reviewer Feedback &amp; Notes <i class="req">*</i></label><span>Markdown Enabled</span></div>
+      <textarea id="notes" rows="5">Excellent benchmark analysis. In Section 3, please explicitly list the CUDA and TensorRT versions used, and add a brief warning regarding activation clipping on Ada Lovelace architecture.</textarea>
+      <div class="notes-foot"><span>Mandatory for Change Requests</span><span id="count">0 chars</span></div>
+
+      <button class="act approve" id="approve"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>Approve Article</button>
+      <p class="fine">Approved articles remain unpublished until authorized by author or editorial board.</p>
+      <button class="act changes" id="changes"><svg viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>Request Changes</button>
+      <button class="reassign" id="reassign"><svg viewBox="0 0 24 24"><path d="M7 7h12l-3-3M17 17H5l3 3"/></svg>Outside My Expertise // Reassign</button>
+      <div class="logged"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Review cryptographically logged under Reviewer ID: WK-BLIDA-09</span></div>
+    </aside>
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+<footer class="footer" id="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="brand">
+        <a href="#home" class="logo"><img src="logo.png" alt="ITC Blog"></a>
+        <div class="brand-name">
+          INFORMATION<br>
+          TECHNOLOGY<br>
+          COMMUNITY<i class="dot"></i>
+        </div>
+      </div>
+      <p class="muted">A community of students learning, building, and sharing their passion for technology at Blida 1.</p>
+      <div class="socials">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M15 3v11a4 4 0 11-4-4M15 3c.5 3 2.5 4.5 5 4.5"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z"/></svg></a>
+        <a href="#" aria-label="Discord"><svg viewBox="0 0 24 24"><path d="M7 7c3-1.5 7-1.5 10 0l2 9c-2 1.5-4 2-4 2l-1-2c-1 .3-3 .3-4 0l-1 2s-2-.5-4-2z"/><circle cx="9.5" cy="12.5" r="1"/><circle cx="14.5" cy="12.5" r="1"/></svg></a>
+      </div>
+    </div>
+    <div>
+      <h4>Explore ITC</h4>
+      <div class="two-col">
+        <ul><li><a href="#home" class="on">Home</a></li><li><a href="#">Events</a></li><li><a href="#">Departments</a></li><li><a href="#">About</a></li></ul>
+        <ul><li><a href="#">Projects</a></li><li><a href="#">Members</a></li><li><a href="#">Stats</a></li></ul>
+      </div>
+    </div>
+    <div>
+      <h4>Let's connect</h4>
+      <p class="muted">Have a question, an idea, or a collaboration in mind? We'd love to hear from you.</p>
+      <a class="mail" href="mailto:contact.itc.blida@gmail.com">contact.itc.blida@gmail.com</a>
+      <address>University of Blida 1<br>Route de Soumâa, BP 270<br>09000 Blida, Algeria</address>
+      <a href="mailto:contact.itc.blida@gmail.com" class="btn btn-ghost sm">Get in touch ↗</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span id="year">2026</span> Information Technology Community. All rights reserved.</span>
+    <span><i class="sq"></i> Built by the community, for the community.</span>
+  </div>
+</footer>
+<script src="article.js"></script>
+</body>
+</html>
