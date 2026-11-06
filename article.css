@@ -449,8 +449,6 @@ tbody tr.best td{
 
 /* Review sidebar */
 .review{
-    position:sticky;
-    top:84px;
     background:linear-gradient(180deg,#140908,#0b0b0b 40%);
     border:1px solid #1d1d1d;
     border-radius:18px;
