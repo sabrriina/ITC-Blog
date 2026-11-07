@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reviewer Workspace – ITC Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.png">
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="reviewer.css">
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a href="index.html" class="logo"><img src="logo.png" alt="ITC Blog"></a>
+  <button class="burger" id="burger" aria-label="Toggle menu" aria-expanded="false"><i></i><i></i><i></i></button>
+  <nav class="links" id="links">
+    <a href="index.html">Home</a>
+    <a href="articles.html" >Articles</a>
+    <a href="Reviewer.html" class="active">Reviewer Workspace</a>
+    <a href="MyArticles.html">My Articles</a>
+    <a href="index.html#footer">About</a>
+    <a href="index.html#footer" class="btn btn-red nav-cta">Contact Us</a>
+  </nav>
+</header>
+
+<main class="rw">
+  <section class="rw-head">
+    <div>
+      <h1>Reviewer Workspace</h1>
+      <p>Assigned technical manuscripts awaiting your peer-review evaluation. All submitted code benches and kernel telemetry must be validated prior to clearance.</p>
+    </div>
+    <div class="token">
+      <svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+      <div><small>REVIEWER TOKEN</small><b>0x7F...C84A (Active)</b></div>
+    </div>
+  </section>
+
+  <section class="kpis">
+    <div class="kpi"><div class="k-top"><span>QUEUE ALLOCATION</span><svg class="amber" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h6"/></svg></div>
+      <div class="k-num"><b id="kPending">3</b><em class="amber">PENDING</em></div><p>Assigned to You</p><div class="k-bar"><i style="--w:50%;background:var(--red)"></i></div></div>
+    <div class="kpi"><div class="k-top"><span>TRIAGE CRITICAL</span><svg class="red" viewBox="0 0 24 24"><path d="M12 4v10M12 19v.5"/></svg></div>
+      <div class="k-num"><b id="kUrgent">1</b><em class="red">URGENT</em></div><p><span id="kUrgentTxt">1</span> High Priority</p><div class="k-bar"><i style="--w:100%;background:var(--red)"></i></div></div>
+    <div class="kpi"><div class="k-top"><span>CADENCE RECORD</span><svg class="blue" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></div>
+      <div class="k-num"><b>2</b><em class="blue">ARCHIVED</em></div><p>2 Reviewed this Month</p><div class="k-bar"><i style="--w:40%;background:#8ea2ff"></i></div></div>
+    <div class="kpi"><div class="k-top"><span>VELOCITY METRIC</span><svg class="salmon" viewBox="0 0 24 24"><path d="M4 18a8 8 0 1116 0M12 18l4-6"/></svg></div>
+      <div class="k-num"><b>48<small>h</small></b><em>NOMINAL</em></div><p>Avg Review Turnaround: 48h</p><div class="k-bar"><i style="--w:80%;background:#ffb4a3"></i></div></div>
+  </section>
+
+  <div class="list-head">
+    <h2><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 10l3 2-3 2M12 15h5"/></svg>Assigned Manuscripts <span class="count" id="entries">03_ENTRIES</span></h2>
+    <span class="mode"><i class="rd"></i>DISPATCH MODE: MANUAL_ADMIN</span>
+  </div>
+
+  <section class="queue" id="queue">
+    <article class="job hi" data-priority="high" data-title="Quantization Horizons: AWQ vs FP8 Inference on Edge GPUs">
+      <div class="job-main">
+        <div class="job-meta">
+          <span class="chip prio"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>HIGH PRIORITY</span><span class="chip grey">AI</span>
+          <span class="when"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Nov 22, 2024 (2 days ago)</span><i class="dot"></i><span class="id">AWQ-821</span>
+        </div>
+        <h3>Quantization Horizons: AWQ vs FP8 Inference on Edge GPUs</h3>
+        <p>Systematic benchmark analyzing compute throughput, memory compression ratios, and perplexity degradation on Jetson Orin compute nodes under TensorRT-LLM runtimes.</p>
+        <div class="who"><span class="avatar red">YM</span><b>Yacine M.</b><span class="role">(AI Lab)</span><i class="sl">/</i><span class="st"><i class="rd"></i>Status: Awaiting Review</span></div>
+      </div>
+      <div class="job-act">
+        <a href="article.html" class="btn btn-red">Review Article <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <button class="btn out" type="button"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg>Outside My Expertise</button>
+      </div>
+    </article>
+
+    <article class="job" data-title="Automating Multi-Region WireGuard Mesh Networks">
+      <div class="job-main">
+        <div class="job-meta">
+          <span class="chip prio">CLOUD</span>
+          <span class="when"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Nov 23, 2024 (1 day ago)</span><i class="dot"></i><span class="id">NET-540</span>
+        </div>
+        <h3>Automating Multi-Region WireGuard Mesh Networks</h3>
+        <p>Constructing dynamic topology negotiation using custom etcd state synchronization across hybrid cloud infrastructure nodes.</p>
+        <div class="who"><span class="avatar red">SK</span><b>Sarah K.</b><span class="role">(DevOps Lead)</span><i class="sl">/</i><span class="st"><i class="rd"></i>Status: Awaiting Review</span></div>
+      </div>
+      <div class="job-act">
+        <a href="#" class="btn btn-red">Review Article <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <button class="btn out" type="button"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg>Outside My Expertise</button>
+      </div>
+    </article>
+
+    <article class="job" data-title="Kernel-Level Packet Filtering with XDP in C">
+      <div class="job-main">
+        <div class="job-meta">
+          <span class="chip prio">CYBERSECURITY</span>
+          <span class="when today">Nov 24, 2024 (Today)</span><i class="dot"></i><span class="id">XDP-109</span>
+        </div>
+        <h3>Kernel-Level Packet Filtering with XDP in C</h3>
+        <p>Zero-copy ingress filtering directly in device driver hook layer for DDoS mitigation without OS stack latency.</p>
+        <div class="who"><span class="avatar red">MB</span><b>Mehdi B.</b><span class="role">(Cybersecurity)</span><i class="sl">/</i><span class="st"><i class="rd"></i>Status: Awaiting Review</span></div>
+      </div>
+      <div class="job-act">
+        <a href="#" class="btn btn-red">Review Article <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <button class="btn out" type="button"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg>Outside My Expertise</button>
+      </div>
+    </article>
+  </section>
+  <div class="empty" id="empty" hidden><b>Queue cleared</b>No manuscripts are currently assigned to you.</div>
+
+  <section class="protocol">
+    <svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><circle cx="12" cy="11" r="2"/></svg>
+    <div><b>EVALUATION PROTOCOL V1.4</b><p>Per ITC Blida charter, assignments are scheduled for 48h turnarounds. Manual admin reassignment occurs upon declaration.</p></div>
+    <span class="sla">SLA: 48:00:00</span><span class="auto">• AUTO-ROUTING OFF</span>
+  </section>
+</main>
+
+<dialog id="modal" class="modal" aria-labelledby="mTitle">
+  <form id="mForm" method="dialog" novalidate>
+    <div class="m-head">
+      <div>
+        <div class="eyebrow"><i class="rd"></i>REASSIGNMENT DIRECTIVE</div>
+        <h2 id="mTitle">Return Assignment: Outside My Expertise</h2>
+        <p class="m-art">Article : <b id="mArticle"></b></p>
+      </div>
+      <button type="button" class="x" id="mClose" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+
+    <div class="warn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><p>Returning an assignment does <b>NOT</b> reject the article. It will return to the global assignment queue for manual administrator reassignment, and your reason will be logged for tracking.</p></div>
+
+    <div class="f-head"><label for="reason">Reason for Return <i class="req">*</i></label><span>REQUIRED FIELD</span></div>
+    <textarea id="reason" rows="4" placeholder="I specialize in computer vision and natural language processing, but this paper deals heavily with low-level CUDA compiler kernels and FP8 tensor core hardware intrinsics…"></textarea>
+
+    <div class="f-head sp"><label for="topic">Suggested Topic or Recommended Expertise</label><span>OPTIONAL</span></div>
+    <div class="field"><svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="6"/><circle cx="12" cy="10" r="2"/><path d="M8 15l-2 6 6-3 6 3-2-6"/></svg><input id="topic" type="text" placeholder="Hardware / GPU Systems / High-Performance Computing"></div>
+    <p class="help">Provides recommendations to the editorial board for routing this manuscript to a qualified researcher.</p>
+
+    <div class="manual"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>Manual Admin Reassignment Queue // No automated redistribution engines active.</div>
+
+    <div class="m-foot">
+      <button type="button" class="btn cancel" id="mCancel">Cancel</button>
+      <button type="submit" class="btn btn-red"><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5M4 9h10a6 6 0 010 12h-3"/></svg>Return Assignment</button>
+    </div>
+  </form>
+</dialog>
+
+<footer class="footer" id="footer">
+  <div class="footer-grid">
+    <div>
+      <a href="index.html" class="brand"><img src="logo.png" alt="ITC Blog"><span>INFORMATION<br>TECHNOLOGY<br>COMMUNITY <i class="sq"></i></span></a>
+      <p class="muted">A community of students learning, building, and sharing their passion for technology at Blida 1.</p>
+      <div class="socials">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M15 3v11a4 4 0 11-4-4M15 3c.5 3 2.5 4.5 5 4.5"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z"/></svg></a>
+        <a href="#" aria-label="Discord"><svg viewBox="0 0 24 24"><path d="M7 7c3-1.5 7-1.5 10 0l2 9c-2 1.5-4 2-4 2l-1-2c-1 .3-3 .3-4 0l-1 2s-2-.5-4-2z"/><circle cx="9.5" cy="12.5" r="1"/><circle cx="14.5" cy="12.5" r="1"/></svg></a>
+      </div>
+    </div>
+    <div>
+      <h4>Explore ITC</h4>
+      <div class="two-col">
+        <ul><li><a href="index.html" >Home</a></li><li><a href="#">Events</a></li><li><a href="#">Departments</a></li><li><a href="index.html#footer">About</a></li></ul>
+        <ul><li><a href="#">Projects</a></li><li><a href="#">Members</a></li><li><a href="#">Stats</a></li></ul>
+      </div>
+    </div>
+    <div>
+      <h4>Let's connect</h4>
+      <p class="muted">Have a question, an idea, or a collaboration in mind? We'd love to hear from you.</p>
+      <a class="mail" href="mailto:contact.itc.blida@gmail.com">contact.itc.blida@gmail.com</a>
+      <address>University of Blida 1<br>Route de Soumâa, BP 270<br>09000 Blida, Algeria</address>
+      <a href="mailto:contact.itc.blida@gmail.com" class="btn btn-ghost sm">Get in touch ↗</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span id="year">2026</span> Information Technology Community. All rights reserved.</span>
+    <span><i class="sq"></i> Built by the community, for the community.</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+<script src="reviewer.js"></script>
+</body>
+</html>

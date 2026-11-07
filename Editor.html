@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Article Editor – ITC Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.png">
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="editor.css">
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a href="index.html" class="logo"><img src="logo.png" alt="ITC Blog"></a>
+  <button class="burger" id="burger" aria-label="Toggle menu" aria-expanded="false"><i></i><i></i><i></i></button>
+  <nav class="links" id="links">
+    <a href="index.html">Home</a>
+    <a href="articles.html" >Articles</a>
+    <a href="Reviewer.html">Reviewer Workspace</a>
+    <a href="MyArticles.html" class="active">My Articles</a>
+    <a href="index.html#footer">About</a>
+    <a href="index.html#footer" class="btn btn-red nav-cta">Contact Us</a>
+  </nav>
+</header>
+
+<main class="ed">
+  <div class="actions-bar">
+    <a href="MyArticles.html" class="btn btn-red back"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back to My Articles</a>
+    <div class="right">
+      <button class="btn dark" type="button" id="save"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6"/></svg>Save Draft</button>
+      <button class="btn btn-red" type="button" id="submit"><svg viewBox="0 0 24 24"><path d="M5 15c-1 1-2 4-2 6 2 0 5-1 6-2M14 4c4-1 6-1 7-1 0 1 0 3-1 7l-6 6-5-5zM9 14l-3-1 2-4h4M15 8.5h.01"/></svg>Submit for review</button>
+    </div>
+  </div>
+
+  <div class="inner">
+    <div class="banner">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>
+      <p><b>Peer Review Lifecycle:</b> If modifying an article marked with <span class="tag a">Changes Requested</span>, submitting from this screen automatically re-qualifies the draft into <span class="tag b">Pending Review</span> without duplicating commit IDs.</p>
+    </div>
+
+    <div class="lbl"><label for="title">ARTICLE TITLE</label><span>H1 LEVEL METADATA</span></div>
+    <input id="title" class="title" type="text" value="High-Performance Concurrent Cache Invalidation">
+
+    <div class="lbl sub"><label for="abstract">ARTICLE SUBTITLE &amp; EXECUTIVE ABSTRACT</label></div>
+    <textarea id="abstract" class="abstract" rows="2">Optimizing sync.Map and custom sharded hash tables for 500k RPS while mitigating lock contention in write-heavy distributed microservices.</textarea>
+
+    <div class="meta-row">
+      <div>
+        <div class="lbl"><label for="topic">PRIMARY DISCIPLINE / TOPIC</label></div>
+        <div class="select"><select id="topic">
+          <option>Software Engineering</option><option>DevOps</option><option>Cloud</option><option>Cybersecurity</option><option>Databases</option><option>Web Development</option><option>AI</option>
+        </select><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>
+      </div>
+      <div>
+        <div class="lbl"><span class="l">TELEMETRY &amp; ESTIMATION</span></div>
+        <div class="box"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg><span id="calc">Calculated: ~8 min read (1,840 words)</span></div>
+      </div>
+      <div>
+        <div class="lbl"><span class="l">TARGET NODE</span></div>
+        <div class="box node"><span>ITC-BLIDA-MAIN</span><i class="rd"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar" id="toolbar" role="toolbar" aria-label="Formatting">
+    <div class="tools">
+      <button type="button" data-cmd="h1" aria-label="Heading 1">H1</button>
+      <button type="button" data-cmd="h2" aria-label="Heading 2">H2</button>
+      <button type="button" data-cmd="h3" aria-label="Heading 3">H3</button>
+      <i class="sep"></i>
+      <button type="button" data-cmd="bold" aria-label="Bold"><b>B</b></button>
+      <button type="button" data-cmd="italic" aria-label="Italic"><em>I</em></button>
+      <button type="button" data-cmd="strike" aria-label="Strikethrough"><s>S</s></button>
+      <i class="sep"></i>
+      <button type="button" data-cmd="ul" aria-label="Bullet list"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></button>
+      <button type="button" data-cmd="ol" aria-label="Numbered list"><svg viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10M4 5l1-1v4M4 13h2l-2 3h2M4 19h2v1H4v1h2"/></svg></button>
+      <button type="button" data-cmd="quote" aria-label="Quote"><b class="q">99</b></button>
+      <i class="sep"></i>
+      <button type="button" data-cmd="code" aria-label="Inline code"><svg viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg></button>
+      <button type="button" data-cmd="block" aria-label="Code block"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 10l3 2-3 2M12 15h5"/></svg></button>
+      <button type="button" data-cmd="image" aria-label="Insert image"><svg viewBox="0 0 24 24"><path d="M12 20H5a1 1 0 01-1-1V5a1 1 0 011-1h14a1 1 0 011 1v8M4 16l5-5 4 4M16 19l3-3 2 2M17 9h.01"/></svg></button>
+    </div>
+    <div class="status"><span>MARKDOWN ENABLED</span><i class="dot"></i><b>SYNC_READY</b></div>
+  </div>
+  <input type="file" id="file" accept="image/*" hidden>
+
+  <article class="content" id="editor" contenteditable="true" spellcheck="false">
+    <h2>1. The Invalidation Bottleneck at Scale</h2>
+    <p>In high-throughput microservices, local caching layers often degrade when invalidation bursts cascade across nodes. While Go’s standard library provides <code>sync.Map</code> for concurrent safety, write-amplified cache purges cause severe lock degradation and cache-line bouncing across multi-core NUMA sockets.</p>
+    <p>To mitigate this under a continuous 500k RPS benchmark, we migrated from unified mutex-locked buckets to custom partitioned sharded ring buffers, isolating write workloads completely from telemetry read pipelines.</p>
+
+    <div class="cb" contenteditable="false">
+      <div class="cb-bar"><i class="d1"></i><i class="d2"></i><i class="d3"></i><b class="fn" contenteditable="true">cache_partition_v2.go</b>
+        <span class="syn">SYNTAX:</span><select class="lang" aria-label="Syntax"><option>Go</option><option>Rust</option><option>C</option><option>Python</option><option>JavaScript</option></select>
+        <button type="button" class="copy" aria-label="Copy code"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 012-2h9"/></svg></button></div>
+<pre class="cb-code" contenteditable="true"><span class="k">package</span> cache
+
+<span class="k">import</span> (
+    <span class="s">"sync"</span>
+    <span class="s">"sync/atomic"</span>
+)
+
+<span class="c">// ShardedCache optimizes lock-free reads while isolating invalidation shards</span>
+<span class="k">type</span> <span class="t">ShardedCache</span> <span class="k">struct</span> {
+    shards []*CacheShard
+    mask   <span class="ty">uint64</span>
+    seed   <span class="ty">uint64</span>
+}
+
+<span class="k">type</span> <span class="t">CacheShard</span> <span class="k">struct</span> {
+    sync.RWMutex
+    entries <span class="k">map</span>[string]*CacheValue
+    metrics <span class="ty">uint64</span>
+}
+
+<span class="k">func</span> NewShardedCache(size <span class="ty">int</span>) *ShardedCache {
+    shardCount := <span class="n">64</span> <span class="c">// CPU cache-line aligned partition</span>
+    sc := &amp;ShardedCache{
+        shards: <span class="k">make</span>([]*CacheShard, shardCount),
+        mask:   <span class="ty">uint64</span>(shardCount - <span class="n">1</span>),
+    }
+    <span class="k">for</span> i := <span class="n">0</span>; i &lt; shardCount; i++ {
+        sc.shards[i] = &amp;CacheShard{
+            entries: <span class="k">make</span>(<span class="k">map</span>[string]*CacheValue),
+        }
+    }
+    <span class="k">return</span> sc
+}</pre>
+    </div>
+
+    <h2>2. Benchmark Profiling &amp; Latency Distribution</h2>
+    <p>Using <code>pprof</code> and synthetic load injectors simulating erratic write surges, p99.9 latency drops from 48.2ms under global contention down to 1.84ms with zero heap allocations during steady-state invalidations.</p>
+
+    <figure class="fig" contenteditable="false">
+        <div class="fig-img">
+            <img src="pics/editor.jpg" alt=" ">
+        </div>
+        <figcaption>
+            <b>TELEMETRY EVIDENCE // BENCHMARK FIG-01</b>
+            <p>Comparative profile analysis: P99 latency variance across 64 shards vs. standard mutex primitives at 500,000 queries per second with a 15% write-invalidation mix.</p>
+            <small><span>LATENCY: -94.2%</span><span>ALLOCS: 0 B/op</span><span>GOROUTINES: 10,000</span></small>
+        </figcaption>
+    </figure>
+
+    <p>In our next section, we walk through building atomic generational markers so keys can be marked expired in O(1) without requiring immediate heap deletions.</p>
+  </article>
+</main>
+
+<footer class="footer" id="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="brand">
+        <a href="#home" class="logo"><img src="logo.png" alt="ITC Blog"></a>
+        <div class="brand-name">
+          INFORMATION<br>
+          TECHNOLOGY<br>
+          COMMUNITY<i class="dot"></i>
+        </div>
+      </div>
+      <p class="muted">A community of students learning, building, and sharing their passion for technology at Blida 1.</p>
+      <div class="socials">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M15 3v11a4 4 0 11-4-4M15 3c.5 3 2.5 4.5 5 4.5"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z"/></svg></a>
+        <a href="#" aria-label="Discord"><svg viewBox="0 0 24 24"><path d="M7 7c3-1.5 7-1.5 10 0l2 9c-2 1.5-4 2-4 2l-1-2c-1 .3-3 .3-4 0l-1 2s-2-.5-4-2z"/><circle cx="9.5" cy="12.5" r="1"/><circle cx="14.5" cy="12.5" r="1"/></svg></a>
+      </div>
+    </div>
+    <div>
+      <h4>Explore ITC</h4>
+      <div class="two-col">
+        <ul><li><a href="index.html" >Home</a></li><li><a href="#">Events</a></li><li><a href="#">Departments</a></li><li><a href="#">About</a></li></ul>
+        <ul><li><a href="#">Projects</a></li><li><a href="#">Members</a></li><li><a href="#">Stats</a></li></ul>
+      </div>
+    </div>
+    <div>
+      <h4>Let's connect</h4>
+      <p class="muted">Have a question, an idea, or a collaboration in mind? We'd love to hear from you.</p>
+      <a class="mail" href="mailto:contact.itc.blida@gmail.com">contact.itc.blida@gmail.com</a>
+      <address>University of Blida 1<br>Route de Soumâa, BP 270<br>09000 Blida, Algeria</address>
+      <a href="mailto:contact.itc.blida@gmail.com" class="btn btn-ghost sm">Get in touch ↗</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span id="year">2026</span> Information Technology Community. All rights reserved.</span>
+    <span><i class="sq"></i> Built by the community, for the community.</span>
+  </div>
+</footer>
+
+<script src="editor.js"></script>
+</body>
+</html>

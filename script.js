@@ -4,13 +4,13 @@ const featured = [
     tag: "Software Engineering", meta: ["RFC #042", "Published Oct 24, 2024"], read: 11,
     title: "Distributed Raft Consensus in Go: Lessons from Building ITC Portal V4",
     excerpt: "A deep post-mortem detailing state machine replication, split-brain mitigation, and network partition simulations under high concurrency during our annual hackathon infrastructure.",
-    author: "Yacine Khemis", role: "Principal Systems Lead @ ITC", initials: "YK", primary: true, img: "pics/DistributedRaftConsensusinGo.jpg", avatar: "pics/YacineKhemis.jpg"
+    author: "Yacine Khemis", role: "Principal Systems Lead @ ITC", initials: "YK", primary: true, img: "pics/DistributedRaftConsensusinGo.jpg", avatar: "pics/yacineKhemis.jpg"
   },
   {
     tag: "AI & NLP", meta: ["Research Paper", "Nov 02, 2024"], read: 8,
     title: "Fine-Tuning Llama 3 for Algerian Darija NLP",
     excerpt: "Methodology, low-rank adaptation (LoRA) hyperparameters, and synthetic corpus tokenization challenges when fine-tuning multilingual open models…",
-    author: "Amina Benali", role: "ML Research Division", initials: "AB", primary: false, img: "pics/Fine-TuningLlama3.jpg", avatar: "pics/AminaBenali.jpg"
+    author: "Amina Benali", role: "ML Research Division", initials: "AB", primary: false, img: "pics/Fine-TuningLlama3.jpg", avatar: "pics/aminabenali.jpg"
   }
 ];
 

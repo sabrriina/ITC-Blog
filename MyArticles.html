@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Author Manuscripts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.png">
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="MyArticles.css">
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a href="index.html" class="logo"><img src="logo.png" alt="ITC Blog"></a>
+  <button class="burger" id="burger" aria-label="Toggle menu" aria-expanded="false"><i></i><i></i><i></i></button>
+  <nav class="links" id="links">
+    <a href="index.html">Home</a>
+    <a href="articles.html" >Articles</a>
+    <a href="Reviewer.html">Reviewer Workspace</a>
+    <a href="MyArticles.html" class="active">My Articles</a>
+    <a href="index.html#footer">About</a>
+    <a href="index.html#footer" class="btn btn-red nav-cta">Contact Us</a>
+  </nav>
+</header>
+
+<div class="glow">
+<main class="am">
+  <section class="am-head">
+    <div>
+      <h1>AUTHOR MANUSCRIPTS</h1>
+      <p>Manage your technical manuscripts, drafts, review statuses, and reviewer feedback.</p>
+    </div>
+    <a href="editor.html" class="btn btn-red new" id="newBtn"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg>New Article</a>
+  </section>
+
+  <section class="bar">
+    <label class="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input type="search" id="search" placeholder="Filter personal manuscripts by title, topic, or keyword..." aria-label="Filter manuscripts">
+    </label>
+    <div class="scope"><span><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>Scope: Strictly Author Scoped</span><em>RESTRICTED</em></div>
+  </section>
+
+  <nav class="tabs" id="tabs" aria-label="Filter by status"></nav>
+
+  <section class="items" id="items" aria-live="polite"></section>
+
+  <section class="stats">
+    <div class="stat"><div class="s-top"><span class="red">PUBLISH RATE</span><svg class="red" viewBox="0 0 24 24"><path d="M3 17l5-5 4 4 8-9M16 7h4v4"/></svg></div><b>66.7%</b><p>4 of 6 manuscripts passed editorial peer review on first cycle.</p><div class="line"><i style="--w:65%;background:#e8190c"></i></div></div>
+    <div class="stat"><div class="s-top"><span class="blue">AVG REVIEW LATENCY</span><svg class="blue" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg></div><b>18.4 hrs</b><p>Blida Core Infra review turnaround benchmark is &lt;24 hours.</p><div class="line"><i style="--w:70%;background:#1f6bff"></i></div></div>
+    <div class="stat"><div class="s-top"><span class="green">COMMUNITY READS</span><svg class="green" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><circle cx="5" cy="10" r="2"/><circle cx="19" cy="10" r="2"/><path d="M6 20c0-3 3-5 6-5s6 2 6 5M2 18c0-2 1.5-3.5 3.5-3.5M22 18c0-2-1.5-3.5-3.5-3.5"/></svg></div><b>1,420</b><p>Total unique readers across published technical notes this quarter.</p><div class="line"><i style="--w:80%;background:#1fd18a"></i></div></div>
+  </section>
+</main>
+</div>
+
+<dialog id="dlg" class="dlg">
+  <h3 id="dTitle"></h3>
+  <p id="dBody"></p>
+  <div class="d-foot"><button class="btn cancel" id="dCancel" type="button">Cancel</button><button class="btn btn-red" id="dOk" type="button">OK</button></div>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<footer class="footer" id="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="brand">
+        <a href="#home" class="logo"><img src="logo.png" alt="ITC Blog"></a>
+        <div class="brand-name">
+          INFORMATION<br>
+          TECHNOLOGY<br>
+          COMMUNITY<i class="dot"></i>
+        </div>
+      </div>
+      <p class="muted">A community of students learning, building, and sharing their passion for technology at Blida 1.</p>
+      <div class="socials">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M15 3v11a4 4 0 11-4-4M15 3c.5 3 2.5 4.5 5 4.5"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z"/></svg></a>
+        <a href="#" aria-label="Discord"><svg viewBox="0 0 24 24"><path d="M7 7c3-1.5 7-1.5 10 0l2 9c-2 1.5-4 2-4 2l-1-2c-1 .3-3 .3-4 0l-1 2s-2-.5-4-2z"/><circle cx="9.5" cy="12.5" r="1"/><circle cx="14.5" cy="12.5" r="1"/></svg></a>
+      </div>
+    </div>
+    <div>
+      <h4>Explore ITC</h4>
+      <div class="two-col">
+        <ul><li><a href="index.html" class="on">Home</a></li><li><a href="#">Events</a></li><li><a href="#">Departments</a></li><li><a href="#">About</a></li></ul>
+        <ul><li><a href="#">Projects</a></li><li><a href="#">Members</a></li><li><a href="#">Stats</a></li></ul>
+      </div>
+    </div>
+    <div>
+      <h4>Let's connect</h4>
+      <p class="muted">Have a question, an idea, or a collaboration in mind? We'd love to hear from you.</p>
+      <a class="mail" href="mailto:contact.itc.blida@gmail.com">contact.itc.blida@gmail.com</a>
+      <address>University of Blida 1<br>Route de Soumâa, BP 270<br>09000 Blida, Algeria</address>
+      <a href="mailto:contact.itc.blida@gmail.com" class="btn btn-ghost sm">Get in touch ↗</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span id="year">2026</span> Information Technology Community. All rights reserved.</span>
+    <span><i class="sq"></i> Built by the community, for the community.</span>
+  </div>
+</footer>
+<script src="MyArticles.js"></script>
+</body>
+</html>
